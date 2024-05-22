@@ -1,0 +1,2 @@
+# staticshok
+Static site generator
