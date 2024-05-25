@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import *
 
 
 class TestTextNode(unittest.TestCase):
@@ -59,6 +59,56 @@ class TestTextNode(unittest.TestCase):
         )
         html = node2.to_html()
         self.assertEqual(html, expected)
+
+    def test_simple_markdown_to_html(self):
+        text = "This is a simple paragraph"
+        html = markdown_to_html(text)
+        expect = ParentNode("div", [LeafNode("p", "This is a simple paragraph")])
+        self.assertEqual(html, expect)
+
+    def test_compliex_markdown_to_html(self):
+        text = """
+# This is a heading
+
+```
+This is code
+```
+
+* Item 1
+* Item 2
+
+1. Item 1
+2. Item 2
+
+>This is quoted
+>text.
+
+This is a paragraph
+"""
+        html = markdown_to_html(text)
+        expect = ParentNode(
+            "div",
+            [
+                LeafNode("h1", "# This is a heading\n"),
+                ParentNode("pre", [LeafNode("code", "```\nThis is code\n```\n")]),
+                ParentNode(
+                    "ul", [LeafNode("li", "* Item 1"), LeafNode("li", "* Item 2")]
+                ),
+                ParentNode(
+                    "ol", [LeafNode("li", "1. Item 1"), LeafNode("li", "2. Item 2")]
+                ),
+                LeafNode("blockquote", ">This is quoted\n>text.\n"),
+                LeafNode("p", "This is a paragraph\n"),
+            ],
+        )
+        self.assertEqual(html, expect)
+
+    def test_extract_title(self):
+        text = "# This is my title"
+        title = extract_title(text)
+        self.assertEqual(title, text)
+
+        self.assertRaises(Exception, msg="no header in this file")
 
 
 if __name__ == "__main__":
