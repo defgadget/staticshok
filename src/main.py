@@ -1,11 +1,12 @@
 import os
 import shutil
 
-from htmlnode import markdown_to_html
+from markdown_blocks import markdown_to_html_node
 
 
 def main():
     generate_page("./content/index.md", "./template.html", "./public/index.html")
+    move_files("./static", "./public")
 
 
 def move_files(from_path: str, to_path) -> None:
@@ -47,7 +48,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
         template_contents = template_file.read()
 
     title = extract_title(from_contents)
-    contents = markdown_to_html(from_contents).to_html()
+    contents = markdown_to_html_node(from_contents).to_html()
 
     template_contents = template_contents.replace("{{ Title }}", title)
     template_contents = template_contents.replace("{{ Content }}", contents)
