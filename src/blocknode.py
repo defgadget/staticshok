@@ -19,6 +19,8 @@ class BlockNode:
 
 
 def block_to_block_type(block: str) -> BlockNode:
+    if block == "" or block == None:
+        raise Exception("Something went wrong")
     lines = block.splitlines()
 
     is_heading = False
@@ -29,10 +31,10 @@ def block_to_block_type(block: str) -> BlockNode:
 
     if block[0] == "#":
         count = 1
-        for c in block[1:]:
-            if c == " " and count < 6:
+        for i in range(1, len(block)):
+            if block[i] == " " and count < 6:
                 is_heading = True
-            elif c == "#":
+            elif block[i] == "#":
                 count += 1
             else:
                 break

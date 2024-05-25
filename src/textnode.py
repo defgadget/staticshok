@@ -142,15 +142,17 @@ def text_to_textnodes(text) -> list[TextNode]:
 
 
 def markdown_to_blocks(text: str) -> list[str]:
-    blocks = text.splitlines(True)
+    blocks = text.splitlines()
     new_nodes = []
     block_str = ""
     for block in blocks:
-        if block == "\n":
+        if block.strip() == "":
             if len(block_str) > 0:
+                if block_str == "":
+                    print("adding block str --", block_str)
                 new_nodes.append(block_str)
                 block_str = ""
         else:
-            block_str += block
+            block_str += block.strip() + "\n"
     new_nodes.append(block_str)
     return new_nodes

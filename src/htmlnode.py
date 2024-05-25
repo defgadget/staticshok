@@ -108,6 +108,8 @@ def markdown_to_html(document: str) -> HTMLNode:
     blocks = markdown_to_blocks(document)
     typed_blocks = []
     for block in blocks:
+        if block == "" or block == None:
+            continue
         typed_blocks.append(block_to_block_type(block))
 
     children = []
@@ -137,57 +139,33 @@ def paragraph_block_to_html(block: BlockNode) -> HTMLNode:
 def heading_block_to_html(block: BlockNode) -> HTMLNode:
     count = block.block.count("#", 0, 6)
     heading = f"h{count}"
-    return LeafNode(heading, block.block)
+    return LeafNode(heading, block.block[count + 1 :])
 
 
 def code_block_to_html(block: BlockNode) -> HTMLNode:
-    return ParentNode("pre", [LeafNode("code", block.block)])
+    stripped = block.block.replace("```", "")
+    return ParentNode("pre", [LeafNode("code", stripped)])
 
 
 def quote_block_to_html(block: BlockNode) -> HTMLNode:
-    return LeafNode("blockquote", block.block)
+    stripped = block.block.replace(">", "")
+    return LeafNode("blockquote", stripped)
 
 
 def unord_list_block_to_html(block: BlockNode) -> HTMLNode:
     lines = block.block.splitlines()
     children = []
     for line in lines:
-        children.append(LeafNode("li", line))
+        children.append(LeafNode("li", line[2:]))
     return ParentNode("ul", children)
 
 
 def ord_list_block_to_html(block: BlockNode) -> HTMLNode:
     lines = block.block.splitlines()
     children = []
+    count = 1
     for line in lines:
-        children.append(LeafNode("li", line))
+        token = f"{count}. "
+        children.append(LeafNode("li", line[len(token) :]))
+        count += 1
     return ParentNode("ol", children)
-
-
-def extract_title(markdown: str) -> str:
-    lines = markdown.splitlines()
-    for line in lines:
-        if line.startswith("# "):
-            return line
-    raise Exception("no header in this file")
-
-
-def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
-    with open(from_path) as from_file:
-        from_contents = from_file.read()
-
-    with open(template_path) as template_file:
-        template_contents = template_file.read()
-
-    title = extract_title(from_contents)
-    contents = markdown_to_html(from_contents).to_html()
-
-    template_contents.replace("{{ Title }}", title)
-    template_contents.replace("{{ Content }}", contents)
-
-    dirs = os.path.dirname(dest_path)
-    os.makedirs(dirs, exist_ok=True)
-
-    with open(dest_path, "w") as dest_file:
-        dest_file.write(template_contents)

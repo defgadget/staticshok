@@ -63,7 +63,7 @@ class TestTextNode(unittest.TestCase):
     def test_simple_markdown_to_html(self):
         text = "This is a simple paragraph"
         html = markdown_to_html(text)
-        expect = ParentNode("div", [LeafNode("p", "This is a simple paragraph")])
+        expect = ParentNode("div", [LeafNode("p", "This is a simple paragraph\n")])
         self.assertEqual(html, expect)
 
     def test_compliex_markdown_to_html(self):
@@ -102,13 +102,6 @@ This is a paragraph
             ],
         )
         self.assertEqual(html, expect)
-
-    def test_extract_title(self):
-        text = "# This is my title"
-        title = extract_title(text)
-        self.assertEqual(title, text)
-
-        self.assertRaises(Exception, msg="no header in this file")
 
 
 if __name__ == "__main__":
