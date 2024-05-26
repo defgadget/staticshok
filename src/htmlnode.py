@@ -29,7 +29,7 @@ class HTMLNode:
 
         if self.props:
             for k, v in self.props.items():
-                props += f' {k}: "{v}"'
+                props += f' {k}= "{v}"'
         return props
 
 
